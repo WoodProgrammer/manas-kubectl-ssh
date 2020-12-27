@@ -6,8 +6,13 @@ After you fetch this repo, you should move `kubectl-ssh` file somewhere into $PA
 
 `kubectl ssh <LABEL_OF_YOUR>`
 
-## TODO: I will add private key path option to this plugin
+If you want to specify ssh private key path you should do it like this by the way you can use this script without specify ssh-keypair
 
+```
+kubectl ssh master USER_NAME KEY_PATH
+```
+
+If you do not specify SSH user the default value is `ubuntu`.
 ## Installation of JQ
 From the source binary of jq 
 

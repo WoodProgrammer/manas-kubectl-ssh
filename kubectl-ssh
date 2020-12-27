@@ -3,7 +3,7 @@ set -e
 
 get_env(){
     export NODE_TYPE=$1
-    export SSH_USER=$3
+    export SSH_USER=$2
     export SSH_USER=${SSH_USER:=ubuntu}
     export PARSED_NODE=$(kubectl get nodes |grep ${NODE_TYPE}|awk '{print $1}')
     kubectl get nodes $PARSED_NODE -o json > /tmp/node.json
@@ -21,15 +21,24 @@ main(){
 
     fi
 
-    get_env $1
+
+    get_env $1 $2 $3
+    export SSH_KEY=$3
 
     if [[ "${NODE_IP}" == "null" ]]
     then
         echo "Parsing Error"
     else
-        ssh ${SSH_USER}@${NODE_IP}
+
+        if [ -z "$SSH_KEY" ]
+        then
+            ssh ${SSH_USER}@${NODE_IP}
+        else
+            ssh -i ${SSH_KEY} ${SSH_USER}@${NODE_IP}
+        fi
+
     fi
 
 }
 
-main $1
+main $1 $2 $3
