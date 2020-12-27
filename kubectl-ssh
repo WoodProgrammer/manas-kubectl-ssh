@@ -1,0 +1,35 @@
+#!/bin/bash
+set -e
+
+get_env(){
+    export NODE_TYPE=$1
+    export SSH_USER=$3
+    export SSH_USER=${SSH_USER:=ubuntu}
+    export PARSED_NODE=$(kubectl get nodes |grep ${NODE_TYPE}|awk '{print $1}')
+    kubectl get nodes $PARSED_NODE -o json > /tmp/node.json
+    export NODE_IP=$(cat /tmp/node.json|jq '.status.addresses[0].address'|tr -d '"')
+    rm /tmp/node.json
+}
+
+main(){
+
+    FIRST_ARG=$1
+    if [[ "$FIRST_ARG" == "version" ]]
+    then
+        echo "0.0.1"
+        exit 0
+
+    fi
+
+    get_env $1
+
+    if [[ "${NODE_IP}" == "null" ]]
+    then
+        echo "Parsing Error"
+    else
+        ssh ${SSH_USER}@${NODE_IP}
+    fi
+
+}
+
+main $1
